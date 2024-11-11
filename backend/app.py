@@ -11,7 +11,9 @@ import numpy as np
 import pytz
 import concurrent.futures
 import json
-from backend.llm_backend import perform_combined_vector_searches, process_rag_response
+from llm_backend import perform_combined_vector_searches, process_rag_response
+from whoop_processor import WhoopDataProcessor
+import sys
 
 load_dotenv()
 
@@ -282,6 +284,35 @@ def get_whoop_summary():
             
         app.logger.debug(f"Adjusted Start date: {start_date}, End date: {end_date} (UTC)")
         summary = whoop_service.get_last_7_days_summary(start_date, end_date)
+        
+        # Log the summary data
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        log_path = os.path.join(current_dir, 'log.txt')
+        
+        try:
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            with open(log_path, 'a', encoding='utf-8') as f:
+                f.write(f"\n\n=== Whoop Summary Generated {timestamp} ===\n")
+                f.write("Raw Summary Data:\n")
+                f.write(json.dumps(summary, indent=2))
+                f.write("\n" + "="*50 + "\n")
+                
+                # Process and log the preprocessed data
+                processor = WhoopDataProcessor(summary)
+                processed_data = processor.get_processed_data()
+                
+                f.write(f"\n=== Preprocessed Summary Data {timestamp} ===\n")
+                f.write(json.dumps(processed_data, indent=2))
+                f.write("\n" + "="*50 + "\n")
+                f.flush()
+                
+            print(f"Successfully logged summary and preprocessed data to {log_path}")
+            
+        except Exception as log_error:
+            print(f"Error writing to log file: {str(log_error)}")
+            print(f"Current working directory: {os.getcwd()}")
+            logging.error(f"Logging error: {str(log_error)}")
+        
         logging.debug("Successfully generated summary")
         return jsonify(summary)
     except Exception as e:
@@ -297,7 +328,17 @@ def chat():
         whoop_data = data.get('whoopData')
         conversation_history = data.get('conversationHistory', [])
         
-        logging.info(f"Received chat request with query: {user_query}")
+        # Process Whoop data if available
+        if whoop_data:
+            processor = WhoopDataProcessor(whoop_data)
+            processed_whoop_data = processor.get_processed_data()
+            whoop_context = json.dumps(processed_whoop_data, indent=2)
+        else:
+            processed_whoop_data = None
+            whoop_context = ""
+        
+        # Get combined context with Whoop data
+        combined_context = perform_combined_vector_searches(user_query, processed_whoop_data)
         
         # Format conversation history
         formatted_history = ""
@@ -309,14 +350,6 @@ def chat():
                 elif msg.get('type') == 'ai':
                     formatted_history += f"Assistant: {msg.get('response', '')}\n"
             formatted_history += "\nCurrent question:\n"
-        
-        # Get combined context from vector searches
-        combined_context = perform_combined_vector_searches(user_query)
-        
-        # Simply pass the raw Whoop data as JSON
-        whoop_context = ""
-        if whoop_data:
-            whoop_context = f"User's Whoop Data (JSON format):\n{json.dumps(whoop_data, indent=2)}\n"
         
         # Combine contexts
         full_context = f"{formatted_history}\n{combined_context}\n\n{whoop_context}"

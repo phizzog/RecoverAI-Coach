@@ -63,28 +63,17 @@ function ChatInterface({ messages, onSendMessage, whoopData }) {
   const [welcomeMessage] = useState(() => {
     return welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
   });
-  const [followUpPrompts, setFollowUpPrompts] = useState([]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  useEffect(scrollToBottom, [messages, isLoading, followUpPrompts]);
+  useEffect(scrollToBottom, [messages, isLoading]);
 
   const handleSendMessage = async (messageData) => {
     setIsLoading(true);
-    setFollowUpPrompts([]); // Clear existing follow-up prompts
-    
     try {
       await onSendMessage(messageData);
-      
-      // After getting the response, get follow-up questions from the response
-      if (messages.length > 0) {
-        const lastMessage = messages[messages.length - 1];
-        if (lastMessage.type === 'ai' && lastMessage.response?.follow_up_questions) {
-          setFollowUpPrompts(lastMessage.response.follow_up_questions);
-        }
-      }
     } finally {
       setIsLoading(false);
     }
@@ -93,6 +82,13 @@ function ChatInterface({ messages, onSendMessage, whoopData }) {
   const handlePromptClick = (prompt) => {
     handleSendMessage({
       query: prompt,
+      whoopData: whoopData
+    });
+  };
+
+  const handleFollowUpClick = (question) => {
+    handleSendMessage({
+      query: question,
       whoopData: whoopData
     });
   };
@@ -116,21 +112,11 @@ function ChatInterface({ messages, onSendMessage, whoopData }) {
             </div>
           </div>
         )}
-        <MessageList messages={messages} isLoading={isLoading} />
-        {!isLoading && followUpPrompts.length > 0 && (
-          <div className="suggested-prompts follow-up-prompts">
-            <div className="follow-up-title">Related Questions:</div>
-            {followUpPrompts.map((prompt, index) => (
-              <button
-                key={index}
-                className="prompt-button"
-                onClick={() => handlePromptClick(prompt)}
-              >
-                {prompt}
-              </button>
-            ))}
-          </div>
-        )}
+        <MessageList 
+          messages={messages} 
+          isLoading={isLoading} 
+          onFollowUpClick={handleFollowUpClick}
+        />
         <div ref={messagesEndRef} />
       </div>
       <MessageInput onSendMessage={handleSendMessage} whoopData={whoopData} />

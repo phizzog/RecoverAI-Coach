@@ -12,6 +12,7 @@
 /build
 
 # misc
+backend/log.txt
 backend/.env
 .env
 *.env

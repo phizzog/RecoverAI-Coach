@@ -17,13 +17,25 @@ function Message({ message, isLoading, onFollowUpClick }) {
   }
 
   const { type, response, text } = message;
+  
+  // Handle both string and object responses
   const messageContent = type === 'ai' ? 
     (typeof response === 'object' ? response.response : response) : 
     text;
 
+  // Extract follow-up questions and ensure it's an array
   const followUpQuestions = type === 'ai' && 
     typeof response === 'object' && 
-    response.follow_up_questions;
+    Array.isArray(response.follow_up_questions) ? 
+    response.follow_up_questions : [];
+
+  // Remove markdown formatting from follow-up questions if present
+  const cleanFollowUpQuestions = followUpQuestions.map(question => 
+    question
+      .replace(/\*\*/g, '') // Remove all asterisks
+      .replace(/^(First|Second|Third)\s*user\s*question:\s*/i, '') // Remove "First/Second/Third user question:" prefix
+      .trim()
+  );
 
   return (
     <div className={`message ${type}`}>
@@ -32,10 +44,10 @@ function Message({ message, isLoading, onFollowUpClick }) {
       </div>
       <div className="message-content">
         <ReactMarkdown>{messageContent || ''}</ReactMarkdown>
-        {followUpQuestions && followUpQuestions.length > 0 && (
+        {cleanFollowUpQuestions.length > 0 && onFollowUpClick && (
           <div className="follow-up-questions">
             <div className="follow-up-title">Related Questions:</div>
-            {followUpQuestions.map((question, index) => (
+            {cleanFollowUpQuestions.map((question, index) => (
               <button
                 key={index}
                 className="follow-up-button"
