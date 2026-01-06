@@ -1,5 +1,39 @@
-Flask==2.0.1
-Flask-CORS==3.0.10
-python-dotenv==0.19.0
-whoop==0.1.0
-pandas==1.3.3
+# Flask backend
+Flask>=2.0.1
+Flask-CORS>=3.0.10
+
+# Environment and configuration
+python-dotenv>=0.19.0
+
+# Whoop API integration
+whoop>=0.1.0
+
+# Data processing
+pandas>=1.3.3
+numpy>=1.21.0
+
+# LangChain ecosystem
+langchain>=0.1.0
+langchain-community>=0.0.10
+langchain-core>=0.1.0
+langchain-openai>=0.0.5
+langchain-anthropic>=0.1.0
+langchain-google-genai>=0.0.5
+langchain-groq>=0.0.1
+
+# API and validation
+requests>=2.26.0
+pydantic>=1.8.0
+
+# Timezone handling
+pytz>=2021.1
+
+# MongoDB for vector storage
+pymongo>=4.0.0
+
+# FastAPI for embedding services
+fastapi>=0.68.0
+uvicorn>=0.15.0
+
+# Tokenization
+tiktoken>=0.5.0

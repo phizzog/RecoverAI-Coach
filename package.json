@@ -1,7 +1,17 @@
 {
-  "name": "whoop-integration",
+  "name": "recoverai-coach",
   "version": "0.1.0",
-  "private": true,
+  "description": "AI-powered sports recovery chatbot with Whoop integration",
+  "license": "MIT",
+  "keywords": [
+    "whoop",
+    "fitness",
+    "recovery",
+    "ai",
+    "chatbot",
+    "health",
+    "wellness"
+  ],
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",

@@ -14,7 +14,8 @@ app = FastAPI()
 
 # MongoDB connection
 uri = os.environ.get('MONGODB_ATLAS_URI_NUTRITION')
-client = MongoClient(uri, tls=True, tlsAllowInvalidCertificates=True)
+tls_allow_invalid = os.environ.get('TLS_ALLOW_INVALID_CERTS', 'false').lower() == 'true'
+client = MongoClient(uri, tls=True, tlsAllowInvalidCertificates=tls_allow_invalid)
 db = client.docs
 collection = db.embeddings
 

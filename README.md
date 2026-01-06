@@ -1,4 +1,6 @@
-# Sports Recovery Chatbot
+# RecoverAI-Coach
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A personalized AI-powered chatbot that provides recovery advice by analyzing Whoop data, leveraging NVIDIA NeMo and LlamaIndex technologies.
 
@@ -9,22 +11,24 @@ A personalized AI-powered chatbot that provides recovery advice by analyzing Who
 - Multi-domain advice (nutrition, strength training, mindset)
 - Interactive chat interface
 - Data visualization dashboard
+- Support for multiple LLM providers (OpenAI, Anthropic, Google, Groq, NVIDIA, Ollama)
 
 ## Prerequisites
 
 - Python 3.8+
 - Node.js 16+
 - npm 8+
-- MongoDB
-- NVIDIA GPU (recommended)
+- MongoDB Atlas account
+- Whoop account with API access
+- API keys for at least one LLM provider
 
 ## Installation
 
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
-cd sports-recovery-chatbot
+git clone https://github.com/phizzog/RecoverAI-Coach.git
+cd RecoverAI-Coach
 ```
 
 ### 2. Backend Setup
@@ -43,22 +47,6 @@ Install Python dependencies:
 pip install -r requirements.txt
 ```
 
-**Required Python packages:**
-- flask
-- flask-cors
-- python-dotenv
-- pandas
-- whoop
-- langchain
-- langchain-community
-- langchain-core
-- langchain-openai
-- langchain-anthropic
-- langchain-google-genai
-- langchain-groq
-- pydantic
-- requests
-
 ### 3. Frontend Setup
 
 In the root directory:
@@ -67,56 +55,121 @@ In the root directory:
 npm install
 ```
 
-This will install the required React dependencies defined in package.json.
-
 ### 4. Environment Configuration
 
-Create a `.env` file in the backend directory with the following variables:
+Copy the example environment file and configure your credentials:
 
-```env
-# LLM API Keys
-OPENAI_API_KEY=your_openai_api_key
-ANTHROPIC_API_KEY=your_anthropic_api_key
-GOOGLE_API_KEY=your_google_api_key
-GROQ_API_KEY=your_groq_api_key
-
-# Whoop Authentication
-WHOOP_USERNAME=your_whoop_username
-WHOOP_PASSWORD=your_whoop_password
-
-# Database URLs
-NUTRITION_DB_URL=your_nutrition_db_url
-STRENGTH_DB_URL=your_strength_db_url
-MINDSET_DB_URL=your_mindset_db_url
+```bash
+cp backend/.env.example backend/.env
 ```
+
+Edit `backend/.env` with your:
+- Whoop credentials
+- LLM API keys (at least one required)
+- MongoDB Atlas connection URIs
+- Other configuration options
+
+See the `.env.example` file for detailed descriptions of each variable.
 
 ### 5. Database Setup
 
-Ensure your MongoDB instances are running for:
-- Nutrition database (port 5001)
-- Strength training database (port 5002)
-- Mindset database (port 5003)
+You'll need three MongoDB Atlas collections for the vector embeddings:
+- Nutrition database
+- Strength training database
+- Mindset database
+
+Configure the connection URIs in your `.env` file.
 
 ## Running the Application
 
-### 1. Start the Backend Server
+### 1. Start the Embedding Services (Optional)
+
+If using local vector search, start the embedding services:
+
+```bash
+# Terminal 1
+cd "NeMo Retriever"
+python nutrition_embed.py  # Port 5001
+
+# Terminal 2
+python strength_embed.py   # Port 5002
+
+# Terminal 3
+python mindset_embed.py    # Port 5003
+```
+
+### 2. Start the Backend Server
 
 From the backend directory:
 
 ```bash
-# Terminal 1
 python app.py
 ```
 
 The Flask server will start on port 5050.
 
-### 2. Start the Frontend Development Server
+### 3. Start the Frontend Development Server
 
 From the root directory:
 
 ```bash
-# Terminal 2
 npm start
 ```
 
-The application should now be running at http://localhost:3000
+The application will be available at http://localhost:3000
+
+## Configuration
+
+### Environment Variables
+
+Key environment variables (see `.env.example` for full list):
+
+| Variable | Description |
+|----------|-------------|
+| `WHOOP_USERNAME` | Your Whoop account username |
+| `WHOOP_PASSWORD` | Your Whoop account password |
+| `OPENAI_API_KEY` | OpenAI API key |
+| `ANTHROPIC_API_KEY` | Anthropic API key |
+| `MONGODB_ATLAS_URI_*` | MongoDB connection strings |
+| `FLASK_DEBUG` | Enable debug mode (true/false) |
+| `CORS_ORIGINS` | Allowed CORS origins |
+
+### Frontend Configuration
+
+The frontend API URL can be configured via environment variable:
+
+```bash
+REACT_APP_API_URL=http://localhost:5050 npm start
+```
+
+## Project Structure
+
+```
+RecoverAI-Coach/
+├── backend/
+│   ├── app.py              # Flask application
+│   ├── llm_backend.py      # LLM integration
+│   ├── whoop_processor.py  # Whoop data processing
+│   └── requirements.txt    # Python dependencies
+├── src/
+│   ├── components/         # React components
+│   ├── services/           # API services
+│   └── App.js              # Main React app
+├── NeMo Retriever/
+│   ├── nutrition_embed.py  # Nutrition vector service
+│   ├── strength_embed.py   # Strength vector service
+│   └── mindset_embed.py    # Mindset vector service
+└── package.json            # Node.js dependencies
+```
+
+## Contributing
+
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## Security
+
+For security concerns, please see [SECURITY.md](SECURITY.md).
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

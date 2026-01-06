@@ -78,7 +78,8 @@ db_name = "docs"
 collection_name = "embeddings"
 
 # Create a MongoDB client
-mongodb_client = MongoClient(uri, tls=True, tlsAllowInvalidCertificates=True)
+tls_allow_invalid = os.environ.get('TLS_ALLOW_INVALID_CERTS', 'false').lower() == 'true'
+mongodb_client = MongoClient(uri, tls=True, tlsAllowInvalidCertificates=tls_allow_invalid)
 
 # Initialize the MongoDB Atlas vector store
 vector_store = MongoDBAtlasVectorSearch(

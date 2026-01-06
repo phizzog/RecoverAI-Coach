@@ -1,32 +1,61 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
+# Dependencies
 /node_modules
 /.pnp
 .pnp.js
 
-# testing
+# Testing
 /coverage
 
-# production
+# Production
 /build
 
-# misc
-backend/log.txt
+# Environment files
 backend/.env
 .env
-*.env
-.DS_Store
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
+# Logs
+backend/log.txt
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+*.log
 
 # Package lock files
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+venv/
+env/
+.venv/
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# IDE and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Data directories
+NeMo Retriever/data/
