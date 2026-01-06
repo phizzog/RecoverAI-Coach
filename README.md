@@ -4,6 +4,12 @@
 
 A personalized AI-powered chatbot that provides recovery advice by analyzing Whoop data, leveraging NVIDIA NeMo and LlamaIndex technologies.
 
+## About
+
+This project was built for the **NVIDIA and LlamaIndex Developer Contest** (December 2024). It demonstrates the integration of NVIDIA NeMo embeddings with LlamaIndex for building a personalized fitness recovery assistant.
+
+**Author:** Kenny Snyder
+
 ## Features
 
 - Real-time Whoop data integration
